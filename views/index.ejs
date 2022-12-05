@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBIT-SEM</title>
+    <style>
+        *
+        {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+        }
+        button
+        {
+            display: inline-block;
+        }
+        #restful_api
+        {
+            color: cadetblue;
+        }
+        h2
+        {
+            color: coral;
+        }
+        h3
+        {
+            color: rgb(21, 95, 148);
+        }
+        .cen
+        {
+            font-size: 200%;
+        }
+    </style>
+</head>
+<body>
+    
+    <center>
+    <h1 id="restful_api">RESTFUL_API</h1></center>
+
+<center><p class="cen">No route found! Are your trying to access these below?</p></center>
+<h2>
+BASE URL:
+</h2>
+<p>https://cbit-sem-result.herokuapp.com</p>
+<h2>
+DISCLAIMER:
+</h2>
+<p>currently as of today this API can only fetch the marks details of IT-1,IT-2,IT-3 only(excluding LE’s) of R-20 regulation(batch 2020).</p>
+<h1>
+API USAGE
+</h1>
+<h3>
+
+<li>1.REGISTER YOUR SELF TO GET AN API KEY
+</h3></li>
+
+<button style="color:green">
+GET/ register /your-name/ your-password
+</button>
+<p></p>
+<p>eg:<b> https://cbit-sem-result.herokuapp.com/register/this_is_my_name/this_is_my_password</b></p>
+<p>This returns the API key so store it somewhere.</p>
+<h3>
+2.CHECK YOUR API KEY IN CASE IT’S LOST
+</H3>
+<button style="color:green">
+GET/ check /your-name/ your-password
+</button>
+<p>eg: <b> https://cbit-sem-result.herokuapp.com/check/this_is_my_name/this_is_my_password</b></p>
+<h3>
+3.USING API
+</h3>
+<button style="color:green">
+GET/ result /sem-no / your-rollno / your-API-key
+</button>
+<p>eg: <b> https://cbit-sem-result.herokuapp.com/result/2/160120737114/$2b<span class="math inline">10</span>FCvQjjeatLh0bldmR1uHlu0d<span class="math inline"><em>p</em><em>b</em></span>URT6nfBnzz.aOQSFvOi9otDe6</b></p>
+<p>Above request fetches the 2 sem results of rollno 160120737114.</p>
+<h2>
+POINTS TO BE UNDERSTOOD
+</h2>
+<h4>
+<ol type="1">
+<li>The RESTful API stated above is pure JSON API.
+</h4></li>
+</ol>
+<h4>
+<ol start="2" type="1">
+<li>every ERROR producing results has a error property along with the error so make sure you first check the error property in code to know the request status.
+</h4></li>
+</ol>
+<h4>
+<ol start="3" type="1">
+<li>The only NON-error property JSON response i.e the result of a person successfully fetched
+</h4></li>
+</ol>
+
+</body>
+</html>
