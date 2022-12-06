@@ -8,12 +8,14 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import axios from 'axios';
 import { Select, FormControl, InputLabel, MenuItem, Alert, Input, Stack } from '@mui/material';
+import {useNavigate} from 'react-router-dom'
 axios.defaults.withCredentials=true;
+
 
 
 export const TeacherMain = () => {
   const fileRef = React.useRef()
-
+  const nav=useNavigate()
   const [course, SetCourse] = React.useState()
   const [attendance, SetAttendance] = React.useState()
   const [date, setDate] = React.useState()
@@ -71,6 +73,8 @@ export const TeacherMain = () => {
 
   function attend(e)
   {
+        e.preventDefault()
+         nav('/attendance',{state:{date:date,attendance:attendance}})
 
   }
 
@@ -131,9 +135,10 @@ export const TeacherMain = () => {
           </Stack>
         </form>
       </Box>
+      <form onSubmit={attend}>
       <Box>
         <Typography variant='h4' margin={3}>Take attendance</Typography>
-        <FormControl onSubmit={attend} margin='15px' fullWidth>
+        <FormControl  margin='15px' fullWidth>
             <InputLabel id="demo-simple-select-label">Course</InputLabel>
             <Select
               labelId="demo-simple-select-label"
@@ -153,11 +158,11 @@ export const TeacherMain = () => {
 
               
             </Select>
-            <Input sx={{marginTop:'15px'}} onChange={handleDate}  type='date'/>
-            <Button sx={{margin:'15px'}} type='submit'>Proceed</Button>
+            <Input sx={{marginTop:'15px'}} onChange={handleDate}  type='date' required/>
+            <Button sx={{margin:'15px'}}   type='submit'>Proceed</Button>
           </FormControl>
       </Box>
-
+</form>
     </>
   )
 }

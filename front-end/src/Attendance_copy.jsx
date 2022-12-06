@@ -1,8 +1,8 @@
 import React from 'react'
 import axios from 'axios'
-import { Button, Paper, Typography, Card, CardActions, CardContent, Box, Select } from '@mui/material'
+import { Button, Paper, Typography, Card, CardActions, CardContent, Box, Select, Alert } from '@mui/material'
 // import {DesktopDatePicker} from '@mui/x-date-pickers/DesktopDatePicker'
-
+import {useLocation} from 'react-router-dom'
 function reducing(state, action) {
     switch (action.type) {
         case 'add':
@@ -21,13 +21,16 @@ function reducing(state, action) {
     }
 }
 export const Attendance_copy = () => {
+    const {state:rend}=useLocation()
+    
     const [data, setData] = React.useState(false)
+    const [alert, setAlert] = React.useState({status:false,message:''})
+    
     const [limit, setLimit] = React.useState(true)
     const [init, setInit] = React.useState(0)
     const [course, setCourse] = React.useState(false)
     const [state, dispatcher] = React.useReducer(reducing, [])
-    const courseRef = React.useRef()
-    const secRef = React.useRef()
+
     console.log(course);
     console.log(state);
     // React.useEffect(, [])
@@ -80,7 +83,7 @@ export const Attendance_copy = () => {
     }
     function fetch(sec)
     {
-        
+            sec=sec.toLowerCase()
             axios.get(`http://localhost:2555/students/${sec}`,{headers:{key:'$2b$10$U3OZ.3UR6D9ajgOfpdN9M.wmYBLne3tD9gatmcsG4$y9iiIGmCiAK'}})
                 .then((result) => {
                     console.log(result.data.length);
@@ -91,42 +94,46 @@ export const Attendance_copy = () => {
                 });
         
     }
-    function initializer() {
-        const sec=secRef.current.value
-         setCourse({ course: courseRef.current.value, sec: sec}) 
-         setData(false)
-         setInit(0)
-         
-         fetch(sec)
-
-        
-        
-        }
+    React.useEffect(
+        function initializer() {
+     
+            const sec=rend.attendance.split("-")[2]
+             setData(false)
+             setInit(0)
+             console.log(sec)
+             fetch(sec)
+    
+            
+            
+            },[]
+    )
+    
 
     function upload_attend()
     {
-        axios.post('http://localhost:2555/attendance/',{  name:courseRef.current.value,section:secRef.current.value,date:'28/08/2003',values:state})
+        const sec=rend.attendance.split("-")[2]
+        axios.post('http://localhost:2555/attendance/',{  subject:rend.attendance,section:sec,date:rend.date,values:state})
         .then((result) => {
             console.log(result)
+            setAlert({status:true,message:result.data.message})
         }).catch((err) => {
             console.log(err)
         });
     }    
     return (
         <>
-            <center>
-                <Typography sx={{ display: 'inline-block', marginRight: '5px' }}>Course Name</Typography>
-                <input type='text' ref={courseRef} />
+            {/* <center>
+              
                 <br />
                 <Typography sx={{ display: 'inline-block', marginRight: '5px' }}>Select Class</Typography>
                 <select ref={secRef}>
-                    <option value='it1' >it1</option>
-                    <option value='it2' >it2</option>
+                    
                 </select>
                 <br></br>
-                <Button onClick={initializer}>set-Subject</Button></center>
+                <Button onClick={initializer}>set-Subject</Button></center> */}
             {data ?
                 <>
+               {alert.status? <Alert onClose={()=>{setAlert(false)}}>{alert.message}</Alert>:null}
 
                     <Paper elevation={3} sx={{ display: 'flex', justifyContent: 'center', fontFamily: ' Gemunu Libre', fontSize: '120%' }}>
                         <Card  >

@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const { response } = require("express");
 
-const { mod1, mod2, mod3, auth_mod, api_model, student_mod_it1, student_mod_it2, attendance } = database;
+const { mod1, mod2, mod3, auth_mod, api_model, student_mod_it1, student_mod_it2,student_mod_it3, attendance } = database;
 const { Login, Student, Teacher,Course } = teacher
 
 const routes = express.Router();
@@ -243,10 +243,11 @@ routes.get("/result/:sem/:id/", checker, (req, res) => {
   }
 });
 routes.get('/students/:section', (req, res) => {
+  console.log(req.params.section)
   if (req.params.section === 'it1') {
     student_mod_it1.find().sort([['ID', 1]])
       .then((result) => {
-
+      //  console.log(result)
         res.send(result)
       }).catch((err) => {
         console.log(err)
@@ -256,7 +257,18 @@ routes.get('/students/:section', (req, res) => {
   else if (req.params.section === 'it2') {
     student_mod_it2.find().sort([['ID', 1]])
       .then((result) => {
+      //  console.log(result)
+        res.send(result)
+      }).catch((err) => {
+        console.log(err)
+      });
 
+  }
+
+  else if (req.params.section === 'it3') {
+    student_mod_it3.find().sort([['ID', 1]])
+      .then((result) => {
+      //  console.log(result)
         res.send(result)
       }).catch((err) => {
         console.log(err)
@@ -268,24 +280,38 @@ routes.get('/students/:section', (req, res) => {
 routes.post('/attendance/', (req, res) => {
 
   const { date, values, subject, section } = req.body
-  console.log(date)
-  console.log(values)
-  console.log(subject)
-  console.log(section)
-  instance = new attendance({ date: date })
-  //  attendance.insertMany({date:date,subject:{name:subject,section:section,values:values}})
-  //  .then((result) => {
-  //   console.log(result)
-  //  }).catch((err) => {
-  //   console.log(err);
-  //  });
-  instance.subject.push({ values, name: subject, section })
-  instance.save()
-    .then((result) => {
-      console.log(result)
-    }).catch((err) => {
-
-    });
+  attendance.findOne({date:date,name:subject})
+  .then((result) => {
+    if(result)
+    {
+      res.send({status:false,message:'already inserted to this course'})
+    }
+    else
+    {
+      instance = new attendance({ date: date })
+      attendance.insertMany({date:date,name:subject,subject:{section:section,values:values}})
+      .then((result) => {
+       console.log(result)
+       res.send({status:true,message:'succesfully inserted'})
+      }).catch((err) => {
+       console.log(err);
+      });
+    }
+  }).catch((err) => {
+    console.log('error in post attendacne ',err)
+  });
+  // console.log(date)
+  // console.log(values)
+  // console.log(subject)
+  // console.log(section)
+  
+  // instance.subject.push({ values, name: subject, section })
+  // instance.save()
+  //   .then((result) => {
+  //     console.log(result)
+  //   }).catch((err) => {
+  //        console.log(err)
+  //   });
 
 })
 // ************************************************************
@@ -318,7 +344,7 @@ routes.post('/login', async (req, res) => {
       {
         req.session.faculty=true;
         req.session.id=roll
-  console.log(response.FacultyStat)
+  // console.log(response.FacultyStat)
   const sections=[]
       const result= await Course.find({facultyId:roll})
       result.map((item)=>
@@ -326,7 +352,7 @@ routes.post('/login', async (req, res) => {
         sections.push(item.Name+'-'+item.courseID)
       })
       req.session.sections=sections
-      console.log(req.session)
+      // console.log(req.session)
 
        return res.send({ faculty:true,status: true, message: 'logged in succesfuly' })
   
@@ -335,7 +361,7 @@ routes.post('/login', async (req, res) => {
       {
         req.session.student=true;
         req.session.id=roll
-        console.log(response.FacultyStat)
+        // console.log(response.FacultyStat)
        return res.send({ status: true, message: 'logged in succesfuly' })
   
       }
@@ -371,7 +397,7 @@ routes.post('/login', async (req, res) => {
 })
 routes.get('/teacher/sections',(req,res)=>
 {
-  console.log("in teacher",req.session)
+  // console.log("in teacher",req.session)
   res.send(req.session.sections)
 })
 // ****************************************************************

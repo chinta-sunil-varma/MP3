@@ -22,7 +22,7 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
     // // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type,key');
 
 
     // // Set to true if you need the website to include cookies in the requests sent
