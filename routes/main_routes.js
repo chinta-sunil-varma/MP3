@@ -135,6 +135,17 @@ routes.post("/teacher/upload", (req, res) => {
   })
 })
 
+routes.get('/views/section',(req,res)=>
+{
+  console.log(req.session.sec)
+  Section.find({courseID:{ $regex:`${req.session.sec}`}})
+  .then((result) => {
+    console.log(result)
+    res.send(result)
+  }).catch((err) => {
+    console.log(err)
+  });
+})
 
 routes.post('/general/login', (req, res) => {
   const { username, password } = req.body;
@@ -381,20 +392,20 @@ routes.post('/login', async (req, res) => {
 
       }
       else {
-        Student.findOne({Roll:response.Name})
-        .then((result) => {
-          req.session.student = true;
-          req.session.id = result.Roll
-          req.session.sec=result.Sec
-          req.session.name=result.Name
-          return res.send({ status: true, message: 'logged in succesfuly' })
-        }).catch((err) => {
-          console.log(err)
-          return res.send({ status: false, message: 'cannot logged in succesfuly' })
-        });
-     
+        Student.findOne({ Roll: response.Name })
+          .then((result) => {
+            req.session.student = true;
+            req.session.id = result.Roll
+            req.session.sec = result.Sec
+            req.session.name = result.Name
+            return res.send({ status: true, message: 'logged in succesfuly' })
+          }).catch((err) => {
+            console.log(err)
+            return res.send({ status: false, message: 'cannot logged in succesfuly' })
+          });
+
         // console.log(response.FacultyStat)
-        
+
 
       }
 
@@ -414,21 +425,21 @@ routes.post('/login', async (req, res) => {
     return res.send({ status: true, message: 'logged in succesfuly' })
   }
   if (roll.slice(0, 4) === '1601') {
-     Login.findOne({ Name: roll, Password: password })
-     .then((result) => {
-      exe(result)
-     }).catch((err) => {
-      console.log(err)
-     });
+    Login.findOne({ Name: roll, Password: password })
+      .then((result) => {
+        exe(result)
+      }).catch((err) => {
+        console.log(err)
+      });
 
   }
   else {
-     Login.findOne({ Name: roll, Password: password })
-     .then((result) => {
-      exe(result)
-     }).catch((err) => {
-      console.log(err)
-     });
+    Login.findOne({ Name: roll, Password: password })
+      .then((result) => {
+        exe(result)
+      }).catch((err) => {
+        console.log(err)
+      });
 
   }
 

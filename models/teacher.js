@@ -128,25 +128,32 @@ const sectionSchema = new schema(
         },
         fullName:
         {
-            type:String,
-            required:true,
+            type: String,
+            required: true,
         },
         sections:
             [{
                 secName:
                 {
                     type: String,
-                    required: true
-                },
-                secDesc:
-                {
-                    type: String,
                     required: true,
+                    
                 },
-                file:
-                {
-                    type:String
-                }
+                secAttr:
+                    [{
+
+                        secDesc:
+                        {
+                            type: String,
+                            required: true,
+                        },
+                        file:
+                        {
+                            type: String
+                        }
+                    }]
+
+
             }]
     }
 )
@@ -165,7 +172,7 @@ var Login = instance6.model('Login', loginSchema)
 //     [
 //         {
 //             courseID: '20-IT3-34',
-        
+
 //             sections:
 //                 [{
 //                     secName: "another heading1", secDesc: "this is another section"
@@ -180,7 +187,7 @@ var Login = instance6.model('Login', loginSchema)
 //                     secName: "another heading4", secDesc: "this is another section"
 //                 }
 //                 ]
-        
+
 //     },
 
 //     ]
