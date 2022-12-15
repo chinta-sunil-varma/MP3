@@ -24,6 +24,7 @@
     "call-bind": "^1.0.2",
     "chalk": "^4.1.2",
     "chownr": "^2.0.0",
+    "cloudinary": "^1.33.0",
     "color-convert": "^2.0.1",
     "color-name": "^1.1.4",
     "color-support": "^1.1.3",

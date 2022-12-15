@@ -46,6 +46,8 @@ export default function SignIn() {
       {
         if(result.data.faculty)
         nav('/teacher')
+        else if(result.data.status)
+        nav('/student')
       }
     }).catch((err) => {
       console.log(err)

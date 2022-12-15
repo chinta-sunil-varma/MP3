@@ -5,10 +5,10 @@ const teacher = require("../models/teacher");
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const { response } = require("express");
 
-const { mod1, mod2, mod3, auth_mod, api_model, student_mod_it1, student_mod_it2,student_mod_it3, attendance } = database;
-const { Login, Student, Teacher,Course } = teacher
+
+const { mod1, mod2, mod3, auth_mod, api_model, student_mod_it1, student_mod_it2, student_mod_it3, attendance } = database;
+const { Login, Student, Teacher, Course, Section } = teacher
 
 const routes = express.Router();
 routes.use(bodyParser.json())
@@ -89,21 +89,49 @@ routes.get('/certificate/:sem/:roll/', async (req, res) => {
 });
 
 routes.post("/teacher/upload", (req, res) => {
-  console.log(req.body.course)
+  console.log(req.body)
   // console.log(req.files.fileName)
   const file = req.files.fileName
-  if(!fs.existsSync(path.join("D:", "CBIT_RESULT_API", "uploads", req.body.course)))
-  fs.mkdirSync(path.join("D:", "CBIT_RESULT_API", "uploads", req.body.course))
+  if (!fs.existsSync(path.join("D:", "CBIT_RESULT_API", "uploads", req.body.course)))
+    fs.mkdirSync(path.join("D:", "CBIT_RESULT_API", "uploads", req.body.course))
   uploadPath = path.join("D:", "CBIT_RESULT_API", "uploads", req.body.course, file.name)
   if (fs.existsSync(uploadPath)) {
     return res.send({ 'status': 'fail', message: 'File already Exists!' })
   }
 
-  file.mv(uploadPath, function (err) {
+  file.mv(uploadPath,async function (err) {
     if (err)
       console.log(err)
-    else
+    else {
+    const doc= await Section.findOne({courseID:req.body.courseShort})
+    if(doc!=null)
+
+    {
+      doc.sections=[...doc.sections,{secName:req.body.section,secDesc:req.body.secDesc,file:file.name}]
+    try{
+      const result=await doc.save()
+      console.log(result)
       res.send({ 'status': 'success', message: 'uploaded' })
+    }
+    catch(err)
+    {
+       console.log(err)
+    }
+    }
+    else
+    {
+       Section.insertMany({courseID:req.body.courseShort,fullName:req.body.course,sections:{secName:req.body.section,secDesc:req.body.secDesc,file:file.name}})
+       .then((result) => {
+        console.log(result)
+        res.send({ 'status': 'success', message: 'uploaded' })
+       }).catch((err) => {
+        console.log(err)
+       });
+      
+
+    }
+      
+    }
   })
 })
 
@@ -247,7 +275,7 @@ routes.get('/students/:section', (req, res) => {
   if (req.params.section === 'it1') {
     student_mod_it1.find().sort([['ID', 1]])
       .then((result) => {
-      //  console.log(result)
+        //  console.log(result)
         res.send(result)
       }).catch((err) => {
         console.log(err)
@@ -257,7 +285,7 @@ routes.get('/students/:section', (req, res) => {
   else if (req.params.section === 'it2') {
     student_mod_it2.find().sort([['ID', 1]])
       .then((result) => {
-      //  console.log(result)
+        //  console.log(result)
         res.send(result)
       }).catch((err) => {
         console.log(err)
@@ -268,7 +296,7 @@ routes.get('/students/:section', (req, res) => {
   else if (req.params.section === 'it3') {
     student_mod_it3.find().sort([['ID', 1]])
       .then((result) => {
-      //  console.log(result)
+        //  console.log(result)
         res.send(result)
       }).catch((err) => {
         console.log(err)
@@ -280,31 +308,29 @@ routes.get('/students/:section', (req, res) => {
 routes.post('/attendance/', (req, res) => {
 
   const { date, values, subject, section } = req.body
-  attendance.findOne({date:date,name:subject})
-  .then((result) => {
-    if(result)
-    {
-      res.send({status:false,message:'already inserted to this course'})
-    }
-    else
-    {
-      instance = new attendance({ date: date })
-      attendance.insertMany({date:date,name:subject,subject:{section:section,values:values}})
-      .then((result) => {
-       console.log(result)
-       res.send({status:true,message:'succesfully inserted'})
-      }).catch((err) => {
-       console.log(err);
-      });
-    }
-  }).catch((err) => {
-    console.log('error in post attendacne ',err)
-  });
+  attendance.findOne({ date: date, name: subject })
+    .then((result) => {
+      if (result) {
+        res.send({ status: false, message: 'already inserted to this course' })
+      }
+      else {
+        instance = new attendance({ date: date })
+        attendance.insertMany({ date: date, name: subject, subject: { section: section, values: values } })
+          .then((result) => {
+            console.log(result)
+            res.send({ status: true, message: 'succesfully inserted' })
+          }).catch((err) => {
+            console.log(err);
+          });
+      }
+    }).catch((err) => {
+      console.log('error in post attendacne ', err)
+    });
   // console.log(date)
   // console.log(values)
   // console.log(subject)
   // console.log(section)
-  
+
   // instance.subject.push({ values, name: subject, section })
   // instance.save()
   //   .then((result) => {
@@ -319,75 +345,91 @@ routes.post('/attendance/', (req, res) => {
 
 
 routes.post('/login', async (req, res) => {
- async  function exe (response)
-  {
+  async function exe(response) {
     if (response) {
       //bcrypt this in future
       // bcrypt.compare(password, response.password, function (err, result) {
       //   // result == true
       //   if (result) {
-          
+
       //    else
       //    {
-  
+
       //    }
       //   }
       //   else {
       //     res.send({
       //       status: false, message: 'username or passwrod incorrect'
       //     })
-  
+
       //   }
       // })
-  
-      if(response.FacultyStat)
-      {
-        req.session.faculty=true;
-        req.session.id=roll
-  // console.log(response.FacultyStat)
-  const sections=[]
-      const result= await Course.find({facultyId:roll})
-      result.map((item)=>
-      {
-        sections.push(item.Name+'-'+item.courseID)
-      })
-      req.session.sections=sections
-      // console.log(req.session)
 
-       return res.send({ faculty:true,status: true, message: 'logged in succesfuly' })
-  
-      }
-      else
-      {
-        req.session.student=true;
-        req.session.id=roll
+      if (response.FacultyStat) {
+        req.session.faculty = true;
+        req.session.id = roll
         // console.log(response.FacultyStat)
-       return res.send({ status: true, message: 'logged in succesfuly' })
-  
+        const sections = []
+        const result = await Course.find({ facultyId: roll })
+        result.map((item) => {
+          sections.push(item.Name + '-' + item.courseID)
+        })
+        req.session.sections = sections
+        // console.log(req.session)
+
+        return res.send({ faculty: true, status: true, message: 'logged in succesfuly' })
+
       }
-  
+      else {
+        Student.findOne({Roll:response.Name})
+        .then((result) => {
+          req.session.student = true;
+          req.session.id = result.Roll
+          req.session.sec=result.Sec
+          req.session.name=result.Name
+          return res.send({ status: true, message: 'logged in succesfuly' })
+        }).catch((err) => {
+          console.log(err)
+          return res.send({ status: false, message: 'cannot logged in succesfuly' })
+        });
+     
+        // console.log(response.FacultyStat)
+        
+
+      }
+
     }
     else {
       console.log('unable to fetch');
-     return res.send({ status: false, message: 'credentials mis match' })
-     
+      return res.send({ status: false, message: 'credentials mis match' })
+
     }
   }
-  
+
   console.log('touched')
   const { roll, password } = req.body
-  if (roll === 'qwerty' && password==='qwerty') {
+  if (roll === 'qwerty' && password === 'qwerty') {
     req.session.admin = true
     req.session.activeStat = true
-   return res.send({ status: true, message: 'logged in succesfuly' })
+    return res.send({ status: true, message: 'logged in succesfuly' })
   }
   if (roll.slice(0, 4) === '1601') {
-    const response = await Login.findOne({ Name: roll,Password:password })
-    exe(response)
+     Login.findOne({ Name: roll, Password: password })
+     .then((result) => {
+      exe(result)
+     }).catch((err) => {
+      console.log(err)
+     });
+
   }
   else {
-    const response = await Login.findOne({ Name: roll,Password:password })
-    exe(response)
+     Login.findOne({ Name: roll, Password: password })
+     .then((result) => {
+      exe(result)
+     }).catch((err) => {
+      console.log(err)
+     });
+
   }
 
 
@@ -395,10 +437,26 @@ routes.post('/login', async (req, res) => {
 
 
 })
-routes.get('/teacher/sections',(req,res)=>
-{
+routes.get('/teacher/sections', (req, res) => {
   // console.log("in teacher",req.session)
   res.send(req.session.sections)
+})
+
+routes.post('/add/section', (req, res) => {
+  const { section, course, secDesc } = req.body
+
+})
+routes.get('/add/:section', (req, res) => {
+  const { section } = req.params;
+  console.log(req.params)
+  Section.findOne({ courseID: section })
+    .then((result) => {
+      console.log(result)
+      res.send(result)
+    }).catch((err) => {
+      console.log(err)
+    });
+
 })
 // ****************************************************************
 routes.use((req, res) => {

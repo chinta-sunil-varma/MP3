@@ -6,6 +6,7 @@ import { Attendance_copy } from './Attendance_copy';
 import { Todo } from './Todo';
 import {Que} from './Que'
 import { TeacherMain } from './TeacherMain';
+import { Student } from './Student';
 import SignIn from './SignIn';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -18,6 +19,7 @@ root.render(
     <Route path='/q' element={<Que/>}/>
     <Route path='/teacher' element={<TeacherMain/>}/>
     <Route path='/login' element={<SignIn/>}/>
+    <Route path='/student' element={<Student/>}/>
     {/* <Route path='/discus' element={<AppC/>}/> */}
 
     
