@@ -10,6 +10,7 @@ const fs = require('fs');
 const { mod1, mod2, mod3, auth_mod, api_model, student_mod_it1, student_mod_it2, student_mod_it3, attendance } = database;
 const { Login, Student, Teacher, Course, Section } = teacher
 
+
 const routes = express.Router();
 routes.use(bodyParser.json())
 routes.use(bodyParser.text())
@@ -488,6 +489,33 @@ routes.get('/add/:section', (req, res) => {
     });
 
 })
+
+routes.route('/sections/courses/:secID')
+.get((req , res , next)=>{
+    Course.find({section:req.params.secID})
+    .then((data)=>{res.json(data)
+    console.log("data being sent to client" ,data)
+    })
+})
+
+routes.route('/sections/blocks')
+.get((req , res , next)=>{
+    const sec = req.body.sec
+    const subject = req.body.course
+    console.log("body inside blocks route " ,req.body)
+    Section.find()
+    .then((data)=>{
+      // const arr = data.fullName.split("-")
+      // if(arr[0]===subject && arr[2]===sec){
+        console.log("data inside blocks route " , data[0]);
+        res.json(data)
+    console.log("data being sent to client" ,data)
+      //}
+      
+    })
+})
+
+
 // ****************************************************************
 routes.use((req, res) => {
   res.render('index');
