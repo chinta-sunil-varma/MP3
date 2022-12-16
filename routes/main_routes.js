@@ -31,62 +31,86 @@ checker = (req, res, next) => {
     });
 };
 
-routes.get('/certificate/:sem/:roll/', async (req, res) => {
-  const sem = req.params.sem
-  const id = req.params.roll
-  console.log(req.headers.hehe)
+// routes.get('/certificate/:sem/:roll/', async (req, res) => {
+//   const sem = req.params.sem
+//   const id = req.params.roll
+//   console.log(req.headers.hehe)
 
-  if (sem == 1) {
-    mod1
-      .find({ ID: id })
-      .then((result) => {
-        console.log(result);
-        if (result.length == 0) {
-          return res.json({ error: "DATA NOT FOUND" });
-        }
-        const name = result[0].NAME
-        res.render('certificate', { name: name });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+//   if (sem == 1) {
+//     mod1
+//       .find({ ID: id })
+//       .then((result) => {
+//         console.log(result);
+//         if (result.length == 0) {
+//           return res.json({ error: "DATA NOT FOUND" });
+//         }
+//         const name = result[0].NAME
+//         res.render('certificate', { name: name });
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       });
+//   }
 
-  if (sem == 2) {
-    mod2
-      .find({ ID: id })
-      .then((result) => {
-        console.log(result);
-        const name = result[0].NAME
-        if (result.length == 0) {
-          return res.json({ error: "DATA NOT FOUND" });
-        }
-        res.render('certificate', { name: name });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+//   if (sem == 2) {
+//     mod2
+//       .find({ ID: id })
+//       .then((result) => {
+//         console.log(result);
+//         const name = result[0].NAME
+//         if (result.length == 0) {
+//           return res.json({ error: "DATA NOT FOUND" });
+//         }
+//         res.render('certificate', { name: name });
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       });
+//   }
 
-  if (sem == 3) {
-    mod3
-      .find({ ID: id })
-      .then((result) => {
-        console.log(result);
-        const name = result[0].NAME
-        if (result.length == 0) {
-          return res.json({ error: "DATA NOT FOUND" });
-        }
-        res.render('certificate', { name: name });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  if ((sem > 3) | (sem < 1)) {
-    res.json({ error: 'Data not found!' });
-  }
-});
+//   if (sem == 3) {
+//     mod3
+//       .find({ ID: id })
+//       .then((result) => {
+//         console.log(result);
+//         const name = result[0].NAME
+//         if (result.length == 0) {
+//           return res.json({ error: "DATA NOT FOUND" });
+//         }
+//         res.render('certificate', { name: name });
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       });
+//   }
+//   if ((sem > 3) | (sem < 1)) {
+//     res.json({ error: 'Data not found!' });
+//   }
+// });
+
+routes.get('/certificate/bonafide', (req, res) => {
+
+   
+console.log(req.session)
+
+  mod1
+    .find({ ID: req.session.roll })
+    .then((result) => {
+      console.log(result);
+      if (result.length == 0) {
+        return res.json({ error: "DATA NOT FOUND" });
+      }
+      const name = result[0].NAME
+      res.render('certificate', { name: name });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+
+
+
+})
 
 routes.post("/teacher/upload", (req, res) => {
   console.log(req.body)
@@ -99,52 +123,47 @@ routes.post("/teacher/upload", (req, res) => {
     return res.send({ 'status': 'fail', message: 'File already Exists!' })
   }
 
-  file.mv(uploadPath,async function (err) {
+  file.mv(uploadPath, async function (err) {
     if (err)
       console.log(err)
     else {
-    const doc= await Section.findOne({courseID:req.body.courseShort})
-    if(doc!=null)
+      const doc = await Section.findOne({ courseID: req.body.courseShort })
+      if (doc != null) {
+        doc.sections = [...doc.sections, { secName: req.body.section, secDesc: req.body.secDesc, file: file.name }]
+        try {
+          const result = await doc.save()
+          console.log(result)
+          res.send({ 'status': 'success', message: 'uploaded' })
+        }
+        catch (err) {
+          console.log(err)
+        }
+      }
+      else {
+        Section.insertMany({ courseID: req.body.courseShort, fullName: req.body.course, sections: { secName: req.body.section, secDesc: req.body.secDesc, file: file.name } })
+          .then((result) => {
+            console.log(result)
+            res.send({ 'status': 'success', message: 'uploaded' })
+          }).catch((err) => {
+            console.log(err)
+          });
 
-    {
-      doc.sections=[...doc.sections,{secName:req.body.section,secDesc:req.body.secDesc,file:file.name}]
-    try{
-      const result=await doc.save()
-      console.log(result)
-      res.send({ 'status': 'success', message: 'uploaded' })
-    }
-    catch(err)
-    {
-       console.log(err)
-    }
-    }
-    else
-    {
-       Section.insertMany({courseID:req.body.courseShort,fullName:req.body.course,sections:{secName:req.body.section,secDesc:req.body.secDesc,file:file.name}})
-       .then((result) => {
-        console.log(result)
-        res.send({ 'status': 'success', message: 'uploaded' })
-       }).catch((err) => {
-        console.log(err)
-       });
-      
 
-    }
-      
+      }
+
     }
   })
 })
 
-routes.get('/views/section',(req,res)=>
-{
+routes.get('/views/section', (req, res) => {
   console.log(req.session.sec)
-  Section.find({courseID:{ $regex:`${req.session.sec}`}})
-  .then((result) => {
-    console.log(result)
-    res.send(result)
-  }).catch((err) => {
-    console.log(err)
-  });
+  Section.find({ courseID: { $regex: `${req.session.sec}` } })
+    .then((result) => {
+      console.log(result)
+      res.send(result)
+    }).catch((err) => {
+      console.log(err)
+    });
 })
 
 routes.post('/general/login', (req, res) => {
@@ -395,7 +414,7 @@ routes.post('/login', async (req, res) => {
         Student.findOne({ Roll: response.Name })
           .then((result) => {
             req.session.student = true;
-            req.session.id = result.Roll
+            req.session.roll = result.Roll
             req.session.sec = result.Sec
             req.session.name = result.Name
             return res.send({ status: true, message: 'logged in succesfuly' })

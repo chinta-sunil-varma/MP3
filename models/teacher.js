@@ -128,32 +128,25 @@ const sectionSchema = new schema(
         },
         fullName:
         {
-            type: String,
-            required: true,
+            type:String,
+            required:true,
         },
         sections:
             [{
                 secName:
                 {
                     type: String,
-                    required: true,
-                    
+                    required: true
                 },
-                secAttr:
-                    [{
-
-                        secDesc:
-                        {
-                            type: String,
-                            required: true,
-                        },
-                        file:
-                        {
-                            type: String
-                        }
-                    }]
-
-
+                secDesc:
+                {
+                    type: String,
+                    required: true,
+                },
+                file:
+                {
+                    type:String
+                }
             }]
     }
 )

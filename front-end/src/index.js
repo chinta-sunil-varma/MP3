@@ -8,6 +8,7 @@ import {Que} from './Que'
 import { TeacherMain } from './TeacherMain';
 import { Student } from './Student';
 import SignIn from './SignIn';
+import { Certificate } from './Certificate';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -20,6 +21,7 @@ root.render(
     <Route path='/teacher' element={<TeacherMain/>}/>
     <Route path='/login' element={<SignIn/>}/>
     <Route path='/student' element={<Student/>}/>
+    <Route path='/certificate' element={<Certificate/>}/>
     {/* <Route path='/discus' element={<AppC/>}/> */}
 
     
